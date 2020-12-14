@@ -1,7 +1,6 @@
 def user_info(name, surname, year, city, email, phone):
-    print(f"Меня зовут {name} {surname}. Я {year} года рождения. Живу в городе {city}. Моя почта {email} и "
-          f"телефон - {phone}")
-    return ''
+    return (f"Меня зовут {name} {surname}. Я {year} года рождения. Живу в городе {city}. Моя почта {email} и "
+            f"телефон - {phone}")
 
 
 user = {
