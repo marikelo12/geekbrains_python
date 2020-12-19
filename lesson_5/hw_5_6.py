@@ -1,8 +1,8 @@
 
-with open('text_5_6.txt') as predmet:
+with open('text_5_6.txt', encoding='UTF-8') as predmet:
     subj = {}
     for line in predmet:
-        name = line.split(' ', 1)
+        name = line.split(':', 1)
         elements = len(line)
         my_list = []
         ind = 0
