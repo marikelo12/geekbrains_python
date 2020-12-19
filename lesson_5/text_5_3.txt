@@ -1,0 +1,5 @@
+Ivanov 15000
+Petrov 19000
+Sidorov 23000
+Gubin 18000
+Vasin 22000

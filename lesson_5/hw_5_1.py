@@ -1,4 +1,3 @@
-#
 with open("text_5_1.txt", "w") as my_obj:
     line = input('Вводите текст: ')
     while line:
