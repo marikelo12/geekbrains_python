@@ -1,49 +1,97 @@
-class WareHouse:
-    def __init__(self, name):
-        self.name = name
+from abc import abstractmethod, ABC
 
 
-class OfficeEquipment:
-    def __init__(self, name, price, model, quantity, store: "WareHouse"):
-        self.name = name
-        self.price = price
+class Technics(ABC):
+    def __init__(self, model, serial_no):
         self.model = model
-        self.quantity = quantity
-        self.store = store
+        self.serial_no = serial_no
+        self.department = None
+
+    def _set_department(self, department):
+        self.department = department
+
+    @abstractmethod
+    def __call__(self, data):
+        pass
+
+    @abstractmethod
+    def __str__(self):
+        pass
+
+
+class Printer(Technics):
+    def print_smth(self, data: str):
+        return f'Printer model {self.model} s/n {self.serial_no} printed {data}'
+
+    def __call__(self, data):
+        self.print_smth(data)
 
     def __str__(self):
-        params = ''
-        for key in self.__dict__:
-            if key == 'store':
-                params = f"{params}{key} : {self.__dict__[key].name} \n"
-            else:
-                params = f"{params}{key} : {self.__dict__[key]} \n"
-        return params
+        return f'Printer model {self.model} s/n {self.serial_no}'
 
 
-class Printer(OfficeEquipment):
-    def __init__(self, price, model, quantity, print_speed, store):
-        super().__init__('Printer', price, model, quantity, store)
-        self.print_speed = print_speed
+class Xerox(Technics):
+    def copy_smth(self, data: str):
+        return f'Xerox model {self.model} s/n {self.serial_no} copied {data}'
+
+    def __call__(self, data):
+        self.copy_smth(data)
+
+    def __str__(self):
+        return f'Xerox model {self.model} s/n {self.serial_no}'
 
 
-class Scanner(OfficeEquipment):
-    def __init__(self, price, model, quantity, resolution, store):
-        super().__init__('Scaner', price, model, quantity, store)
-        self.resolution = resolution
+class Scanner(Technics):
+    def scan_smth(self, data: str):
+        return f'Scanner model {self.model} s/n {self.serial_no} scanned {data}'
+
+    def __call__(self, data):
+        self.scan_smth(data)
+
+    def __str__(self):
+        return f'Scanner model {self.model} s/n {self.serial_no}'
 
 
-class Copier(OfficeEquipment):
-    def __init__(self, price, model, quantity, max_size, store):
-        super().__init__('Copier', price, model, quantity, store)
-        self.max_size = max_size
+class Warehouse:
+    def __init__(self, max_volume):
+        self.max_volume = max_volume
+        self.storage = {
+            "scanners": set(),
+            "xeroxes": set(),
+            "printers": set()
+        }
+        self.add_mapper = {Scanner: "scanners", Printer: "printers", Xerox: "xeroxes"}
+        self.total = 0
+
+    def get_several_tecs_to_warehouse(self, num: int, tech_list):
+        if type(num) != int:
+            raise ValueError("Введите число!")
+        for tech in tech_list[:num]:
+            self.get_several_tecs_to_warehouse(tech)
+
+    def get_tech_to_warehouse(self, technics: Technics):
+        if self.total == self.max_volume:
+            raise OverflowError("Склад заполнен до отказа!")
+        self.storage[self.add_mapper[type(technics)]].add(technics)
+        technics._set_department("warehouse")
+        self.total += 1
+
+    def get_tech_to_departament(self, tech_type, department):
+        tech_to_dept = self.storage[tech_type].pop()
+        tech_to_dept._set_department(department)
+        self.total -= 1
+
+    def __call__(self, *args, **kwargs):
+        self.get_tech_to_warehouse(*args, **kwargs)
+
+    def __str__(self):
+        return f'Warehouse max capacity {self.max_volume} current {self.total} '
 
 
-if __name__ == "__main__":
-    warehouse = WareHouse('Stock №1')
-    office_tech = [Printer(5000, 'Samsung', 5, 500, warehouse),
-                   Scanner(2000, 'HP', 10, '1920x1080', warehouse),
-                   Copier(2000, 'Xerox', 7, 'A3', warehouse)]
-    for el in office_tech:
-        print(el)
-
+printer = Printer(1, 2)
+printer_2 = Printer(1, 3)
+scanner = Scanner(2, 3)
+scanner_2 = Scanner(2, 5)
+warehouse = Warehouse(10)
+warehouse.get_tech_to_warehouse(printer)
+warehouse.get_tech_to_departament("printers", "service")
